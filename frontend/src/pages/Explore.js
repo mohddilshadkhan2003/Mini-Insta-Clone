@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import PostModal from '../components/PostModal';
 
@@ -6,61 +6,50 @@ const Explore = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPostId, setSelectedPostId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
 
-  useEffect(() => {
-    fetchExplorePosts();
-  }, []);
-
-  const fetchExplorePosts = async () => {
+  // Memoized fetch function
+  const fetchExplorePosts = useCallback(async (pageNum = 1) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/explore/posts');
-      let postsData = response.data.posts || [];
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/explore/posts', {
+        params: { page: pageNum }
+      });
       
-      if (postsData.length === 0) {
-        postsData = Array.from({ length: 20 }, (_, i) => ({
-          id: `demo-${i}`,
-          image_url: `https://picsum.photos/600/600?random=${i}`,
-          caption: `Post ${i + 1}`,
-          likesCount: Math.floor(Math.random() * 100),
-          commentsCount: Math.floor(Math.random() * 20),
-          username: `user${i + 1}`,
-          user_id: i + 1
-        }));
+      if (pageNum === 1) {
+        setPosts(response.data.posts || []);
+      } else {
+        setPosts(prev => [...prev, ...response.data.posts]);
       }
       
-      setPosts(postsData);
+      setHasMore(response.data.pagination?.hasMore || false);
     } catch (err) {
       console.error('Error fetching explore posts:', err);
-      const fallbackPosts = Array.from({ length: 20 }, (_, i) => ({
-        id: `demo-${i}`,
-        image_url: `https://picsum.photos/600/600?random=${i}`,
-        caption: `Post ${i + 1}`,
-        likesCount: Math.floor(Math.random() * 100),
-        commentsCount: Math.floor(Math.random() * 20),
-        username: `user${i + 1}`,
-        user_id: i + 1
-      }));
-      setPosts(fallbackPosts);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handlePostClick = (post) => {
-    if (!post.id.toString().startsWith('demo-')) {
-      setSelectedPostId(post.id);
-    }
-  };
+  useEffect(() => {
+    fetchExplorePosts(1);
+  }, [fetchExplorePosts]);
 
-  const handleCloseModal = () => {
+  const handlePostClick = useCallback((post) => {
+    setSelectedPostId(post.id);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
     setSelectedPostId(null);
-  };
+  }, []);
 
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
+  const handleLoadMore = useCallback(() => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchExplorePosts(nextPage);
+  }, [page, fetchExplorePosts]);
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && !loading) {
     return (
       <div className="empty-state">
         <h2>No posts found</h2>
@@ -81,9 +70,13 @@ const Explore = () => {
               key={post.id}
               className="explore-post"
               onClick={() => handlePostClick(post)}
-              style={{ cursor: post.id.toString().startsWith('demo-') ? 'default' : 'pointer' }}
+              style={{ cursor: 'pointer' }}
             >
-              <img src={imageUrl} alt={post.caption || 'Post'} />
+              <img 
+                src={imageUrl} 
+                alt={post.caption || 'Post'}
+                loading="lazy"
+              />
               <div className="explore-post-overlay">
                 <div className="explore-post-stats">
                   <span>❤️ {post.likesCount || 0}</span>
@@ -94,6 +87,20 @@ const Explore = () => {
           );
         })}
       </div>
+      {hasMore && (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <button 
+            onClick={handleLoadMore}
+            disabled={loading}
+            className="load-more-button"
+          >
+            {loading ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
+      )}
+      {loading && posts.length === 0 && (
+        <div className="loading">Loading...</div>
+      )}
       {selectedPostId && (
         <PostModal postId={selectedPostId} onClose={handleCloseModal} />
       )}

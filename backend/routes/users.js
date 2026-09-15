@@ -3,33 +3,70 @@ const { db } = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
+const PAGE_SIZE = 12; // Posts per page for user profile
 
 router.get('/:userId', authenticateToken, (req, res) => {
   try {
     const { userId } = req.params;
     const currentUserId = req.user.userId;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const offset = (page - 1) * PAGE_SIZE;
 
+    // Get user info
     const user = db.prepare('SELECT id, username, email, created_at FROM users WHERE id = ?').get(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const followerCount = db.prepare('SELECT COUNT(*) as count FROM follows WHERE following_id = ?').get(userId).count;
+    // Get follower and following counts with single query
+    const stats = db.prepare(`
+      SELECT 
+        (SELECT COUNT(*) FROM follows WHERE following_id = ?) as followerCount,
+        (SELECT COUNT(*) FROM follows WHERE follower_id = ?) as followingCount
+    `).get(userId, userId);
 
-    const followingCount = db.prepare('SELECT COUNT(*) as count FROM follows WHERE follower_id = ?').get(userId).count;
+    // Check if current user follows this user
+    const followStatus = db.prepare(
+      'SELECT id FROM follows WHERE follower_id = ? AND following_id = ?'
+    ).get(currentUserId, userId);
 
-    const isFollowing = db.prepare('SELECT * FROM follows WHERE follower_id = ? AND following_id = ?').get(currentUserId, userId) ? true : false;
+    // Get user's posts with pagination
+    const posts = db.prepare(`
+      SELECT 
+        p.id,
+        p.user_id,
+        p.image_url,
+        p.caption,
+        p.created_at,
+        COUNT(DISTINCT l.id) as likesCount
+      FROM posts p
+      LEFT JOIN likes l ON l.post_id = p.id
+      WHERE p.user_id = ?
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+      LIMIT ? OFFSET ?
+    `).all(userId, PAGE_SIZE, offset);
 
-    const posts = db.prepare('SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC').all(userId);
+    // Get total post count
+    const postCount = db.prepare('SELECT COUNT(*) as count FROM posts WHERE user_id = ?').get(userId).count;
 
     res.json({
       user: {
         ...user,
-        followerCount,
-        followingCount,
-        isFollowing: currentUserId === parseInt(userId) ? null : isFollowing
+        followerCount: stats.followerCount || 0,
+        followingCount: stats.followingCount || 0,
+        isFollowing: currentUserId === parseInt(userId) ? null : (followStatus ? true : false)
       },
-      posts
+      posts: posts.map(p => ({
+        ...p,
+        likesCount: p.likesCount || 0
+      })),
+      pagination: {
+        page,
+        pageSize: PAGE_SIZE,
+        total: postCount,
+        hasMore: offset + PAGE_SIZE < postCount
+      }
     });
   } catch (error) {
     console.error('Get user profile error:', error);
@@ -46,12 +83,14 @@ router.post('/:userId/follow', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Cannot follow yourself' });
     }
 
+    // Check if user exists
     const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const existingFollow = db.prepare('SELECT * FROM follows WHERE follower_id = ? AND following_id = ?').get(currentUserId, userId);
+    // Check if already following
+    const existingFollow = db.prepare('SELECT id FROM follows WHERE follower_id = ? AND following_id = ?').get(currentUserId, userId);
     if (existingFollow) {
       return res.status(400).json({ error: 'Already following this user' });
     }
@@ -70,7 +109,7 @@ router.post('/:userId/unfollow', authenticateToken, (req, res) => {
     const { userId } = req.params;
     const currentUserId = req.user.userId;
 
-    const existingFollow = db.prepare('SELECT * FROM follows WHERE follower_id = ? AND following_id = ?').get(currentUserId, userId);
+    const existingFollow = db.prepare('SELECT id FROM follows WHERE follower_id = ? AND following_id = ?').get(currentUserId, userId);
     if (!existingFollow) {
       return res.status(400).json({ error: 'Not following this user' });
     }
@@ -85,4 +124,3 @@ router.post('/:userId/unfollow', authenticateToken, (req, res) => {
 });
 
 module.exports = router;
-

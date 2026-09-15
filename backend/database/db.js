@@ -4,6 +4,9 @@ const path = require('path');
 const dbPath = path.join(__dirname, 'instagram.db');
 const db = new Database(dbPath);
 
+// Enable foreign keys
+db.pragma('foreign_keys = ON');
+
 function initDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -62,8 +65,22 @@ function initDatabase() {
     )
   `);
 
-  console.log('Database initialized successfully');
+  // Create indexes for performance
+  console.log('Creating database indexes...');
+  
+  db.exec('CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_likes_post_id ON likes(post_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_likes_user_post ON likes(user_id, post_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_follows_unique ON follows(follower_id, following_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+
+  console.log('Database initialized successfully with indexes');
 }
 
 module.exports = { db, initDatabase };
-

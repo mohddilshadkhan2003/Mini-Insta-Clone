@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -18,6 +18,9 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (e) {
         console.error('Error decoding token:', e);
+        // Invalid token, clear it
+        localStorage.removeItem('token');
+        setToken(null);
       }
       setLoading(false);
     } else {
@@ -25,19 +28,19 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const login = (userData, authToken) => {
+  const login = useCallback((userData, authToken) => {
     localStorage.setItem('token', authToken);
     setToken(authToken);
     setUser(userData);
     axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
     delete axios.defaults.headers.common['Authorization'];
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, token }}>
@@ -45,4 +48,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

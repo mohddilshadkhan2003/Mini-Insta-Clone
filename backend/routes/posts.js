@@ -22,7 +22,14 @@ router.post('/', authenticateToken, upload.single('image'), (req, res) => {
       caption || ''
     );
 
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(result.lastInsertRowid);
+    // Avoid additional SELECT - construct response from inserted data
+    const post = {
+      id: result.lastInsertRowid,
+      user_id: userId,
+      image_url: imageUrl,
+      caption: caption || '',
+      created_at: new Date().toISOString()
+    };
 
     res.status(201).json({
       message: 'Post created successfully',
@@ -39,24 +46,33 @@ router.get('/:postId', authenticateToken, (req, res) => {
     const { postId } = req.params;
     const userId = req.user.userId;
 
+    // Optimized single query with JOINs
     const post = db.prepare(`
-      SELECT p.*, u.username, u.id as user_id
+      SELECT 
+        p.id,
+        p.user_id,
+        p.image_url,
+        p.caption,
+        p.created_at,
+        u.username,
+        COUNT(DISTINCT l.id) as likesCount,
+        CASE WHEN EXISTS(SELECT 1 FROM likes WHERE user_id = ? AND post_id = p.id) THEN 1 ELSE 0 END as isLiked
       FROM posts p
-      JOIN users u ON p.user_id = u.id
+      INNER JOIN users u ON p.user_id = u.id
+      LEFT JOIN likes l ON l.post_id = p.id
       WHERE p.id = ?
-    `).get(postId);
+      GROUP BY p.id
+    `).get(userId, postId);
 
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    const likesCount = db.prepare('SELECT COUNT(*) as count FROM likes WHERE post_id = ?').get(postId).count;
-    const isLiked = db.prepare('SELECT * FROM likes WHERE user_id = ? AND post_id = ?').get(userId, postId) ? true : false;
-
+    // Get all comments efficiently
     const comments = db.prepare(`
-      SELECT c.*, u.username
+      SELECT c.id, c.user_id, c.comment, c.created_at, u.username
       FROM comments c
-      JOIN users u ON c.user_id = u.id
+      INNER JOIN users u ON c.user_id = u.id
       WHERE c.post_id = ?
       ORDER BY c.created_at ASC
     `).all(postId);
@@ -64,8 +80,8 @@ router.get('/:postId', authenticateToken, (req, res) => {
     res.json({
       post: {
         ...post,
-        likesCount,
-        isLiked,
+        likesCount: post.likesCount || 0,
+        isLiked: post.isLiked === 1,
         comments
       }
     });
@@ -80,12 +96,14 @@ router.post('/:postId/like', authenticateToken, (req, res) => {
     const { postId } = req.params;
     const userId = req.user.userId;
 
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(postId);
+    // Check if post exists
+    const post = db.prepare('SELECT id FROM posts WHERE id = ?').get(postId);
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    const existingLike = db.prepare('SELECT * FROM likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
+    // Check if already liked
+    const existingLike = db.prepare('SELECT id FROM likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
     if (existingLike) {
       return res.status(400).json({ error: 'Post already liked' });
     }
@@ -104,7 +122,7 @@ router.post('/:postId/unlike', authenticateToken, (req, res) => {
     const { postId } = req.params;
     const userId = req.user.userId;
 
-    const existingLike = db.prepare('SELECT * FROM likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
+    const existingLike = db.prepare('SELECT id FROM likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
     if (!existingLike) {
       return res.status(400).json({ error: 'Post not liked' });
     }
@@ -128,7 +146,8 @@ router.post('/:postId/comment', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Comment text is required' });
     }
 
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(postId);
+    // Check if post exists
+    const post = db.prepare('SELECT id FROM posts WHERE id = ?').get(postId);
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
@@ -139,10 +158,11 @@ router.post('/:postId/comment', authenticateToken, (req, res) => {
       comment.trim()
     );
 
+    // Get the newly inserted comment with username
     const newComment = db.prepare(`
-      SELECT c.*, u.username
+      SELECT c.id, c.user_id, c.comment, c.created_at, u.username
       FROM comments c
-      JOIN users u ON c.user_id = u.id
+      INNER JOIN users u ON c.user_id = u.id
       WHERE c.id = ?
     `).get(result.lastInsertRowid);
 
@@ -157,4 +177,3 @@ router.post('/:postId/comment', authenticateToken, (req, res) => {
 });
 
 module.exports = router;
-
