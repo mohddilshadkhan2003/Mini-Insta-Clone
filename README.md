@@ -1,353 +1,272 @@
-# 🖼️ Mini-Insta-Clone
+# Mini Insta Clone
 
-A high-performance Instagram clone built with **React**, **Express**, and **SQLite** featuring optimized database queries, pagination, and real-time interactions.
+A polished full-stack social media application inspired by Instagram, built with React, Express, and SQLite. The project focuses on clean UI, social interactions, profile management, post creation, authentication, and real-time-like user experiences.
 
-## ✨ Features
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
+[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens)](https://jwt.io/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-- 🔐 **Authentication** - Secure JWT-based signup and login
-- 📱 **Home Feed** - View posts from followed users with pagination
-- 🔍 **Explore** - Discover new posts with infinite scroll
-- 🔎 **Search** - Find users and posts instantly
-- 📸 **Create Posts** - Upload images with captions
-- ❤️ **Like/Unlike** - Instant feedback without page refresh
-- 💬 **Comments** - Add and view comments on posts
-- 👥 **Follow/Unfollow** - Build your network
-- 👤 **User Profiles** - View user info and their posts with pagination
+## Overview
 
-## ⚡ Performance Optimizations
+Mini Insta Clone is a lightweight social platform that brings together the core features users expect from an Instagram-like experience:
 
-- ✅ **11 Database Indexes** - Eliminates table scans
-- ✅ **N+1 Query Fixes** - 40+ queries reduced to 2-3 per request
-- ✅ **Pagination** - All endpoints support page-based pagination
-- ✅ **Lazy Loading** - Images load on scroll
-- ✅ **Optimized State Updates** - Like/unlike updates local state instantly
-- ✅ **React Memoization** - useCallback prevents unnecessary re-renders
+- user authentication and profile management
+- feed browsing with follow-based content
+- explore and discovery pages
+- detailed post views and comments
+- post creation with media upload support
+- likes, follows, and profile interactions
 
----
+This project is designed to be easy to run locally, easy to understand, and a strong starting point for building a production-ready social app.
 
-## 🏗️ Project Structure
+## Live Project
 
-```
+- Repository: https://github.com/mohddilshadkhan2003/Mini-Insta-Clone
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+## Tech Stack
+
+### Frontend
+- React 18
+- React Router
+- Axios
+- CSS Modules / custom CSS styling
+
+### Backend
+- Node.js + Express
+- SQLite + better-sqlite3
+- JWT authentication
+- bcryptjs for password hashing
+- multer for image uploads
+- dotenv for environment setup
+
+## Features
+
+- Secure signup and login flow
+- Personalized social feed
+- Explore page with discovery content
+- Search users and posts
+- Create posts with captions and images
+- Like and comment on posts
+- Follow/unfollow users
+- User profile pages with post collections
+- Responsive, modern UI design
+
+## Project Structure
+
+```bash
 Mini-Insta-Clone/
 ├── backend/
 │   ├── database/
-│   │   └── db.js              (Database setup + indexes)
+│   │   └── db.js
 │   ├── middleware/
-│   │   ├── auth.js            (JWT authentication)
-│   │   └── upload.js          (Image upload config)
+│   │   ├── auth.js
+│   │   └── upload.js
 │   ├── routes/
-│   │   ├── auth.js            (Login/Signup)
-│   │   ├── feed.js            (Optimized feed with pagination)
-│   │   ├── posts.js           (Create/like posts)
-│   │   ├── users.js           (User profiles)
-│   │   └── explore.js         (Optimized explore + search)
+│   │   ├── auth.js
+│   │   ├── feed.js
+│   │   ├── posts.js
+│   │   ├── users.js
+│   │   └── explore.js
 │   ├── scripts/
-│   │   └── seed.js            (Database seeder)
-│   ├── uploads/               (Uploaded images)
-│   ├── server.js              (Express server)
+│   │   └── seed.js
+│   ├── uploads/
+│   ├── server.js
+│   ├── .env.example
 │   ├── package.json
-│   └── .env                   (Environment variables)
-│
-└── frontend/
-    ├── src/
-    │   ├── pages/
-    │   │   ├── HomeFeed.js     (Optimized with pagination)
-    │   │   ├── Explore.js      (Optimized with lazy loading)
-    │   │   ├── CreatePost.js
-    │   │   ├── Profile.js
-    │   │   ├── PostDetail.js
-    │   │   ├── Search.js
-    │   │   ├── Login.js
-    │   │   └── Signup.js
-    │   ├── components/
-    │   ├── context/
-    │   │   └── AuthContext.js  (Auth state management)
-    │   ├── App.js
-    │   └── index.js
-    ├── package.json
-    └── .env (if needed)
+│   └── package-lock.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── App.js
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   └── index.js
+│   ├── package.json
+│   └── package-lock.json
+├── README.md
+└── .gitignore
 ```
 
----
+## Prerequisites
 
-## 📋 Prerequisites
+Before you begin, make sure you have the following installed:
 
-- **Node.js** (v14 or higher) - [Download](https://nodejs.org/)
-- **npm** (comes with Node.js)
-- **Git** (to clone the repo)
+- Node.js v18+
+- npm
+- Git
 
----
+## Quick Start
 
-## 🚀 Quick Start
-
-### Step 1: Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/mohddilshadkhan61816-lab/Mini-Insta-Clone.git
+git clone https://github.com/mohddilshadkhan2003/Mini-Insta-Clone.git
 cd Mini-Insta-Clone
 ```
 
----
-
-### Step 2: Backend Setup
-
-Open **Terminal 1**:
+### 2. Set up the backend
 
 ```bash
-# Navigate to backend folder
 cd backend
-
-# Install dependencies
 npm install
-
-# Create .env file
-# For Mac/Linux:
-cat > .env << EOF
-PORT=5000
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-EOF
-
-# For Windows (PowerShell):
-# Create a file named .env in the backend folder with:
-# PORT=5000
-# JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 ```
 
-#### (Optional) Seed the Database with Demo Data
+Create a `.env` file in the `backend` folder:
+
+```env
+PORT=5000
+JWT_SECRET=your-super-secret-key
+```
+
+You can also copy from the example file:
+
+```bash
+cp env.example .env
+```
+
+Start the backend server:
+
+```bash
+npm start
+```
+
+Optional demo data:
 
 ```bash
 npm run seed
 ```
 
-**Demo Accounts** (from seeded data):
-```
-Celebrity Accounts:
-  iamsrk: Email: shahrukh@gmail.com, Password: shahrukh@123
-  amitabhbachchan: Email: amitabh@gmail.com, Password: amitabh@123
-  akshaykumar: Email: akshay@gmail.com, Password: akshay@123
-  ... and more
+### 3. Set up the frontend
 
-Demo Accounts (password: password123):
-  alice_wonder: alice@example.com
-  bob_photographer: bob@example.com
-  charlie_travel: charlie@example.com
-  diana_fashion: diana@example.com
-  ... and more
-```
-
-#### Start the Backend Server
+Open a new terminal window:
 
 ```bash
-npm start
-```
-
-✅ You should see:
-```
-Server running on port 5000
-Database initialized successfully with indexes
-```
-
-Backend is now running at: **http://localhost:5000**
-
----
-
-### Step 3: Frontend Setup
-
-Open **Terminal 2** (keep Terminal 1 running):
-
-```bash
-# Navigate to frontend folder
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the React development server
 npm start
 ```
 
-✅ The app will automatically open at: **http://localhost:3000**
+The frontend will run at:
 
----
+```text
+http://localhost:3000
+```
 
-## 🧪 Test the Application
+## Demo Accounts
 
-### Create a New Account or Login
+If you seed the database, the app includes demo users such as:
 
-1. **Sign Up**: Click "Sign Up" and create a new account
-   ```
-   Username: testuser (min 3 characters)
-   Email: test@example.com
-   Password: password123 (min 6 characters)
-   ```
+- `alice@example.com` / `password123`
+- `bob@example.com` / `password123`
+- `charlie@example.com` / `password123`
 
-2. **Login**: Use the email and password you just created
+You can also create your own account through the signup form.
 
-3. **Or use demo account** (if you seeded the database):
-   ```
-   Email: alice@example.com
-   Password: password123
-   ```
-
-### Features to Test
-
-✅ **Home Feed** - View posts from users you follow
-✅ **Explore** - Discover posts with pagination
-✅ **Search** - Search for users and posts
-✅ **Create Post** - Upload images with captions
-✅ **Like/Unlike** - Instant like updates (no page refresh)
-✅ **Comment** - Add comments to posts
-✅ **Follow/Unfollow** - Follow other users
-✅ **User Profile** - View user info and their posts
-
----
-
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
-- `POST /api/auth/signup` - Create account
-- `POST /api/auth/login` - Login
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
 
 ### Feed
-- `GET /api/feed?page=1` - Get home feed with pagination
+- `GET /api/feed?page=1`
 
 ### Posts
-- `POST /api/posts` - Create post (with image)
-- `GET /api/posts/:postId` - Get post details
-- `POST /api/posts/:postId/like` - Like a post
-- `POST /api/posts/:postId/unlike` - Unlike a post
-- `POST /api/posts/:postId/comment` - Add comment
+- `POST /api/posts`
+- `GET /api/posts/:postId`
+- `POST /api/posts/:postId/like`
+- `POST /api/posts/:postId/unlike`
+- `POST /api/posts/:postId/comment`
 
 ### Users
-- `GET /api/users/:userId?page=1` - Get user profile with pagination
-- `POST /api/users/:userId/follow` - Follow user
-- `POST /api/users/:userId/unfollow` - Unfollow user
+- `GET /api/users/:userId?page=1`
+- `POST /api/users/:userId/follow`
+- `POST /api/users/:userId/unfollow`
 
 ### Explore
-- `GET /api/explore/posts?page=1` - Get explore posts with pagination
-- `GET /api/explore/search?q=searchterm` - Search users and posts
-- `GET /api/explore/suggestions` - Get follow suggestions
+- `GET /api/explore/posts?page=1`
+- `GET /api/explore/search?q=searchterm`
+- `GET /api/explore/suggestions`
 
----
-
-## 🛠️ Commands Quick Reference
+## Development Commands
 
 ```bash
 # Backend
 cd backend
-npm install              # Install dependencies
-npm start               # Start server (port 5000)
-npm run seed            # Seed database with demo data
-npm run dev             # Run with nodemon (auto-reload)
+npm start
+npm run dev
+npm run seed
 
 # Frontend
 cd frontend
-npm install              # Install dependencies
-npm start               # Start app (port 3000)
-npm build               # Build for production
-npm test                # Run tests
+npm start
+npm run build
 ```
 
----
+## Project Goals
 
-## 🐛 Troubleshooting
+This app demonstrates how to build a social platform using:
 
-### **Port Already in Use**
+- modern frontend architecture
+- RESTful backend APIs
+- database design and indexing
+- efficient feed loading patterns
+- user experience-first UI design
+
+## Roadmap
+
+- [ ] Story feature
+- [ ] Notifications center
+- [ ] Direct messaging
+- [ ] Video uploads
+- [ ] Real-time updates with WebSockets
+- [ ] Production deployment guide
+- [ ] PostgreSQL migration
+
+## Troubleshooting
+
+### Port conflicts
+
+If port `5000` or `3000` is already in use, update your environment variable or run the app on another port.
+
+### Database issues
+
 ```bash
-# If port 5000 is already in use, change in .env:
-PORT=5001
-
-# If port 3000 is already in use, run frontend with:
-PORT=3001 npm start
-```
-
-### **Database Issues**
-```bash
-# Clear the database and reseed:
 rm backend/database/instagram.db
 cd backend
 npm run seed
 ```
 
-### **"Cannot find module" errors**
+### Missing dependencies
+
 ```bash
-# Delete node_modules and reinstall:
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-### **CORS Errors**
-- Make sure backend is running on port 5000
-- Make sure frontend is running on port 3000
-- Check that the API URLs in frontend match the backend port
+## Contributing
 
-### **Images Not Loading**
-- Check that `backend/uploads/` folder exists
-- Verify image URLs use `http://localhost:5000` prefix
-- Check browser console for 404 errors
+Contributions are welcome. If you want to improve the app, feel free to fork the repository and open a pull request.
 
----
+## License
 
-## 📊 Performance Comparison
+This project is licensed under the MIT License.
 
-| Metric | Before Optimization | After Optimization |
-|--------|--------------------|--------------------|
-| Feed Load Queries | 40+ per request | 2-3 per page |
-| Explore Queries | 100+ per request | 1-2 per page |
-| Image Loading | All at once | Lazy loaded |
-| Like/Unlike | Full feed refresh | Local state update |
-| Database Scans | High (no indexes) | Eliminated (indexed) |
-| Page Load Time | ~2-3 seconds | ~500-700ms |
+## Author
+
+Built by Mohd Dilshad Khan.
+
+## Support
+
+For bugs, questions, or feature requests, open an issue in this repository.
 
 ---
 
-## 🔧 Technology Stack
-
-### Backend
-- **Express.js** - Web framework
-- **SQLite + better-sqlite3** - Lightweight database
-- **bcryptjs** - Password hashing
-- **jsonwebtoken** - JWT authentication
-- **multer** - File uploads
-- **dotenv** - Environment variables
-
-### Frontend
-- **React 18** - UI library
-- **React Router** - Navigation
-- **Axios** - HTTP client
-- **Context API** - State management
-
----
-
-## 📈 Future Improvements
-
-- [ ] Notifications system
-- [ ] Direct messaging
-- [ ] Stories feature
-- [ ] Video uploads
-- [ ] Real-time updates with WebSockets
-- [ ] Mobile app with React Native
-- [ ] Production deployment guide
-- [ ] PostgreSQL migration guide
-
----
-
-## 📝 License
-
-This project is open source and available under the MIT License.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to fork this repository and submit pull requests.
-
----
-
-## 📞 Support
-
-For issues or questions, please open a GitHub issue or contact the maintainer.
-
----
-
-**🎉 Happy coding! Enjoy using Mini-Insta-Clone!**
+Made with care for a cleaner, more polished social app experience.
