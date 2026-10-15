@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import PostDetail from './pages/PostDetail';
 import Explore from './pages/Explore';
 import Search from './pages/Search';
+import Landing from './pages/Landing';
 import './App.css';
 
 function App() {
@@ -18,10 +19,15 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
+            {/* Public landing */}
+            <Route path="/" element={<Landing />} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+
+            {/* Authenticated app lives under /feed */}
             <Route
-              path="/"
+              path="/feed"
               element={
                 <PrivateRoute>
                   <HomeFeed />
@@ -76,4 +82,3 @@ function App() {
 }
 
 export default App;
-

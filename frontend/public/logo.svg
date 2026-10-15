@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 28" width="240" height="56" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Mini Insta Clone</title>
+  <defs>
+    <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#6d5efc"/>
+      <stop offset="50%" stop-color="#ff5ea8"/>
+      <stop offset="100%" stop-color="#22c7d5"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="28" rx="6" fill="url(#g1)" />
+  <g transform="translate(8,6)" fill="#fff" font-family="Segoe UI, Roboto, sans-serif" font-weight="700">
+    <text x="0" y="14" font-size="12">Mini</text>
+    <text x="38" y="14" font-size="12" style="letter-spacing:0.02em">Insta</text>
+    <circle cx="98" cy="13" r="6" fill="#fff" opacity="0.12" />
+  </g>
+</svg>
