@@ -1,104 +1,134 @@
 # Mini Insta Clone
 
-A polished full-stack social media application inspired by Instagram, built with React, Express, and SQLite. The project focuses on clean UI, social interactions, profile management, post creation, authentication, and real-time-like user experiences.
+A polished social media experience inspired by Instagram, built with a modern full-stack architecture that combines a React frontend with a Python FastAPI backend and SQLite database.
+
+This project is designed to feel more authentic, dynamic, and production-ready while keeping the structure simple enough for learning, experimentation, and portfolio presentation.
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![Express](https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
 [![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens)](https://jwt.io/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 ## Overview
 
-Mini Insta Clone is a lightweight social platform that brings together the core features users expect from an Instagram-like experience:
+Mini Insta Clone is a social platform where users can:
+- create accounts
+- upload posts
+- follow creators
+- like and comment on content
+- search for people/posts
+- browse a personalized feed
 
-- user authentication and profile management
-- feed browsing with follow-based content
-- explore and discovery pages
-- detailed post views and comments
-- post creation with media upload support
-- likes, follows, and profile interactions
+The app is designed as a learning-friendly portfolio project, but it also feels real and usable.
 
-This project is designed to be easy to run locally, easy to understand, and a strong starting point for building a production-ready social app.
+## Architecture
 
-## Live Project
+```mermaid
+flowchart LR
+    A[User Browser] --> B[React Frontend]
+    B --> C[FastAPI Backend]
+    C --> D[(SQLite Database)]
+    C --> E[Local Uploads Folder]
+    D --> F[Posts, Users, Likes, Comments, Follows]
+```
 
-- Repository: https://github.com/mohddilshadkhan2003/Mini-Insta-Clone
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
+## System Data Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as FastAPI Backend
+    participant D as SQLite Database
+    participant S as Storage
+
+    U->>F: Open app / login / register
+    F->>B: POST /api/auth/signup or login
+    B->>D: Validate user and save credentials
+    D-->>B: User record
+    B-->>F: JWT access token
+
+    U->>F: Create post with image + caption
+    F->>B: POST /api/posts
+    B->>S: Save uploaded image
+    B->>D: Insert post record
+    D-->>B: Confirmation
+    B-->>F: Success response
+
+    U->>F: Browse feed
+    F->>B: GET /api/feed
+    B->>D: Fetch posts + follows + likes
+    D-->>B: Post feed data
+    B-->>F: Feed response
+
+    U->>F: Like/comment/follow
+    F->>B: POST /api/posts/{id}/like
+    B->>D: Update likes/comments/follows
+    D-->>B: Confirmation
+    B-->>F: Updated UI state
+```
+
+## Features
+
+- Secure signup and login using JWT
+- Personalized feed based on follows
+- Create posts with captions and images
+- Like and unlike posts
+- Comment on posts
+- Follow and unfollow users
+- Explore/search content by keyword
+- Profile pages with follower counts and post stats
+- Uploads stored locally for development use
+- Clean REST API design with FastAPI
 
 ## Tech Stack
 
 ### Frontend
-- React 18
+- React.js
 - React Router
 - Axios
-- CSS Modules / custom CSS styling
+- CSS / polished UI
 
 ### Backend
-- Node.js + Express
-- SQLite + better-sqlite3
-- JWT authentication
-- bcryptjs for password hashing
-- multer for image uploads
-- dotenv for environment setup
-
-## Features
-
-- Secure signup and login flow
-- Personalized social feed
-- Explore page with discovery content
-- Search users and posts
-- Create posts with captions and images
-- Like and comment on posts
-- Follow/unfollow users
-- User profile pages with post collections
-- Responsive, modern UI design
+- Python 3.10+
+- FastAPI
+- SQLite
+- JWT Authentication
+- File uploads
+- Python dotenv
 
 ## Project Structure
 
 ```bash
 Mini-Insta-Clone/
 ├── backend/
-│   ├── database/
-│   │   └── db.js
-│   ├── middleware/
-│   │   ├── auth.js
-│   │   └── upload.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── feed.js
-│   │   ├── posts.js
-│   │   ├── users.js
-│   │   └── explore.js
-│   ├── scripts/
-│   │   └── seed.js
-│   ├── uploads/
-│   ├── server.js
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── main.py
+│   │   └── security.py
 │   ├── .env.example
-│   ├── package.json
-│   └── package-lock.json
+│   ├── requirements.txt
+│   └── uploads/
 ├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── App.js
-│   │   ├── App.css
-│   │   ├── index.css
-│   │   └── index.js
+│   ├── public
+│   ├── src
 │   ├── package.json
 │   └── package-lock.json
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── LICENSE
 ```
 
 ## Prerequisites
 
-Before you begin, make sure you have the following installed:
+Before running the project, install:
 
-- Node.js v18+
+- Python 3.10 or later
+- Node.js 18+
 - npm
 - Git
 
@@ -111,41 +141,50 @@ git clone https://github.com/mohddilshadkhan2003/Mini-Insta-Clone.git
 cd Mini-Insta-Clone
 ```
 
-### 2. Set up the backend
+### 2. Set up the backend (Python)
 
 ```bash
 cd backend
-npm install
+python -m venv .venv
+source .venv/bin/activate   # Linux/macOS
+# Windows:
+# .venv\Scripts\activate
+
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Create a `.env` file in the `backend` folder:
+Then open `.env` and update the values if needed:
 
 ```env
-PORT=5000
+APP_NAME=Mini Insta Clone
+APP_ENV=development
+APP_PORT=8000
 JWT_SECRET=your-super-secret-key
+JWT_ALGORITHM=HS256
+DATABASE_PATH=./app/mini_insta.db
+UPLOAD_DIR=./uploads
 ```
 
-You can also copy from the example file:
+### 3. Run the backend
 
 ```bash
-cp env.example .env
+cd backend
+source .venv/bin/activate   # Linux/macOS
+# Windows:
+# .venv\Scripts\activate
+
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Start the backend server:
-
-```bash
-npm start
+The backend will run at:
+```text
+http://localhost:8000
 ```
 
-Optional demo data:
+### 4. Run the frontend
 
-```bash
-npm run seed
-```
-
-### 3. Set up the frontend
-
-Open a new terminal window:
+Open a second terminal and run:
 
 ```bash
 cd frontend
@@ -153,107 +192,78 @@ npm install
 npm start
 ```
 
-The frontend will run at:
+The frontend should run at:
 
 ```text
 http://localhost:3000
 ```
 
-## Demo Accounts
-
-If you seed the database, the app includes demo users such as:
-
-- `alice@example.com` / `password123`
-- `bob@example.com` / `password123`
-- `charlie@example.com` / `password123`
-
-You can also create your own account through the signup form.
+If your frontend is still using the old Node backend at port 5000, update the API base URL to:
+```js
+const API_URL = "http://localhost:8000";
+```
 
 ## API Endpoints
 
 ### Authentication
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
+- `GET /api/auth/me`
 
 ### Feed
 - `GET /api/feed?page=1`
 
 ### Posts
 - `POST /api/posts`
-- `GET /api/posts/:postId`
-- `POST /api/posts/:postId/like`
-- `POST /api/posts/:postId/unlike`
-- `POST /api/posts/:postId/comment`
+- `GET /api/posts/{post_id}`
+- `POST /api/posts/{post_id}/like`
+- `POST /api/posts/{post_id}/unlike`
+- `POST /api/posts/{post_id}/comment`
 
 ### Users
-- `GET /api/users/:userId?page=1`
-- `POST /api/users/:userId/follow`
-- `POST /api/users/:userId/unfollow`
+- `GET /api/users/{user_id}`
+- `POST /api/users/{user_id}/follow`
+- `POST /api/users/{user_id}/unfollow`
 
 ### Explore
-- `GET /api/explore/posts?page=1`
 - `GET /api/explore/search?q=searchterm`
 - `GET /api/explore/suggestions`
 
-## Development Commands
+## Example Requests
 
+### Signup
 ```bash
-# Backend
-cd backend
-npm start
-npm run dev
-npm run seed
-
-# Frontend
-cd frontend
-npm start
-npm run build
+curl -X POST "http://localhost:8000/api/auth/signup?username=alice&email=alice@example.com&password=password123"
 ```
 
-## Project Goals
+### Login
+```bash
+curl -X POST "http://localhost:8000/api/auth/login?email=alice@example.com&password=password123"
+```
 
-This app demonstrates how to build a social platform using:
+### Create Post
+```bash
+curl -X POST "http://localhost:8000/api/posts?caption=hello+world" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "image=@/path/to/image.jpg"
+```
 
-- modern frontend architecture
-- RESTful backend APIs
-- database design and indexing
-- efficient feed loading patterns
-- user experience-first UI design
+## Development Notes
+
+- The app uses SQLite for simplicity and fast local development.
+- Uploaded images are stored in `backend/uploads`.
+- For a production app, you can later migrate to PostgreSQL, cloud storage, and a proper deployment pipeline.
+- This version is built for learning, portfolio display, and fast iteration.
 
 ## Roadmap
 
-- [ ] Story feature
-- [ ] Notifications center
+- [ ] Real-time notifications
+- [ ] Stories
 - [ ] Direct messaging
 - [ ] Video uploads
-- [ ] Real-time updates with WebSockets
-- [ ] Production deployment guide
+- [ ] AI-powered content recommendations
+- [ ] Deployment to Vercel / Railway / Render
 - [ ] PostgreSQL migration
-
-## Troubleshooting
-
-### Port conflicts
-
-If port `5000` or `3000` is already in use, update your environment variable or run the app on another port.
-
-### Database issues
-
-```bash
-rm backend/database/instagram.db
-cd backend
-npm run seed
-```
-
-### Missing dependencies
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## Contributing
-
-Contributions are welcome. If you want to improve the app, feel free to fork the repository and open a pull request.
 
 ## License
 
@@ -261,12 +271,8 @@ This project is licensed under the MIT License.
 
 ## Author
 
-Built by Mohd Dilshad Khan.
-
-## Support
-
-For bugs, questions, or feature requests, open an issue in this repository.
+Built with passion for creating a polished social app experience.
 
 ---
 
-Made with care for a cleaner, more polished social app experience.
+Made with care for a cleaner, more powerful, and more authentic social platform.
